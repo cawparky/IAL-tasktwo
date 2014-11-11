@@ -66,8 +66,10 @@ int hashCode ( tKey key ) {
 */
 
 void htInit ( tHTable* ptrht ) {
+    for (int i = 0; i < HTSIZE; i++)
+        (*ptrht)[i] = NULL;
 
- solved = 0; /*v pripade reseni, smazte tento radek!*/
+ solved = 1; /*v pripade reseni, smazte tento radek!*/
 }
 
 /* TRP s explicitnì zøetìzenými synonymy.
@@ -78,8 +80,13 @@ void htInit ( tHTable* ptrht ) {
 */
 
 tHTItem* htSearch ( tHTable* ptrht, tKey key ) {
+    tHTItem* iptr = (*ptrht)[hashCode(key)];
+    while (iptr != NULL && iptr->key != key)
+        iptr = iptr->ptrnext;
 
- solved = 0; /*v pripade reseni, smazte tento radek!*/
+    return iptr;
+
+ solved = 1; /*v pripade reseni, smazte tento radek!*/
 }
 
 /* 
@@ -95,8 +102,21 @@ tHTItem* htSearch ( tHTable* ptrht, tKey key ) {
 **/
 
 void htInsert ( tHTable* ptrht, tKey key, tData data ) {
+    int hash = hashCode(key);
+    tHTItem* iptr;
+    
+    if ((iptr = htSearch(ptrht, key)) != NULL)
+        iptr->data = data;
+    else
+        if ((iptr = malloc(sizeof(struct tHTItem))) != 0)
+        {
+            iptr->key = key;
+            iptr->data = data;
+            iptr->ptrnext = (*ptrht)[hash];
+            (*ptrht)[hash] = iptr;
+        }
 
- solved = 0; /*v pripade reseni, smazte tento radek!*/
+ solved = 1; /*v pripade reseni, smazte tento radek!*/
 }
 
 /*
@@ -109,6 +129,10 @@ void htInsert ( tHTable* ptrht, tKey key, tData data ) {
 */
 
 tData* htRead ( tHTable* ptrht, tKey key ) {
+    tHTItem* iptr = htSearch(ptrht, key);
+    if (iptr != NULL)
+        return &iptr->data;
+    return NULL;
 
  solved = 0; /*v pripade reseni, smazte tento radek!*/
 }
@@ -124,8 +148,29 @@ tData* htRead ( tHTable* ptrht, tKey key ) {
 */
 
 void htDelete ( tHTable* ptrht, tKey key ) {
-
- solved = 0; /*v pripade reseni, smazte tento radek!*/
+    int isFreed = 0, hash = hashCode(key);
+    tHTItem* preptr;
+    tHTItem* iptr = (*ptrht)[hash];
+    preptr = iptr;
+    while (iptr != NULL && !isFreed)
+    {
+        if (iptr->key == key)
+        {
+            if (preptr == iptr)
+                (*ptrht)[hash] = iptr->ptrnext;
+            else
+                preptr->ptrnext = iptr->ptrnext;
+            free(iptr);
+            isFreed = 1;
+        }
+        else 
+        {
+            preptr = iptr;
+            iptr = iptr->ptrnext;
+        }
+    }
+    preptr = NULL;
+ solved = 1; /*v pripade reseni, smazte tento radek!*/
 }
 
 /* TRP s explicitnì zøetìzenými synonymy.
@@ -134,6 +179,18 @@ void htDelete ( tHTable* ptrht, tKey key ) {
 */
 
 void htClearAll ( tHTable* ptrht ) {
+    tHTItem *iptr,*niptr;
+    for (int i = 0; i<HTSIZE; i++)
+    {
+        iptr = (*ptrht)[i];
+        while (iptr!= NULL)
+        {
+            niptr = iptr->ptrnext;
+            free(iptr);
+            iptr = niptr;
+        }
+        (*ptrht)[i] = NULL;
+    }
 
- solved = 0; /*v pripade reseni, smazte tento radek!*/
+ solved = 1; /*v pripade reseni, smazte tento radek!*/
 }
