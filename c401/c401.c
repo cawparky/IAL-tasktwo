@@ -56,9 +56,8 @@ void BSTInit (tBSTNodePtr *RootPtr) {
 ** Ten bude pou¾it i ve funkcích BSTDelete, BSTInsert a BSTDispose.
 **/
 	
-	
-	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    *RootPtr = NULL;	
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 	
 }	
 
@@ -76,10 +75,20 @@ int BSTSearch (tBSTNodePtr RootPtr, char K, int *Content)	{
 ** problém øe¹te rekurzivním volání této funkce, pøièem¾ nedeklarujte ¾ádnou
 ** pomocnou funkci.
 **/
-							   
-	
-
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    tBSTNodePtr NextPtr = RootPtr;
+    if (NextPtr->Key == K)							   
+        return TRUE;
+    else if (NextPtr == NULL)
+        return FALSE;
+    else
+    {
+        if (NextPtr->Key < K)
+            NextPtr = NextPtr->LPtr;
+        else if (NextPtr->Key > K)
+            NextPtr = NextPtr->RPtr;
+        return BSTSearch(NextPtr, K, Content);
+    }
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 	
 } 
 
@@ -100,10 +109,54 @@ void BSTInsert (tBSTNodePtr* RootPtr, char K, int Content)	{
 ** rychlosti, tak z hlediska pamì»ovıch nárokù. Zde jde ale o ¹kolní
 ** pøíklad, na kterém si chceme ukázat eleganci rekurzivního zápisu.
 **/
+
+    tBSTNodePtr NextPtr = *RootPtr, NewPtr;
 		
-	
-	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    if (NextPtr->Key == K)							   
+    {
+        NextPtr->Key = K;
+        NextPtr->BSTNodeCont = Content;
+        return;
+    }
+    else
+    {
+        if (NextPtr->Key < K)
+        {
+            if (NextPtr->LPtr == NULL)
+            {
+                if ((NewPtr = malloc(sizeof(struct tBSTNode))) != 0)
+                {
+                    NewPtr->Key = K;
+                    NewPtr->BSTNodeCont = Content;
+                    NewPtr->LPtr = NULL;
+                    NewPtr->RPtr = NULL;
+                }
+                NextPtr->LPtr = NewPtr;
+                return;
+            }
+            else 
+                NextPtr = NextPtr->LPtr;
+        }
+        else if (NextPtr->Key > K)
+        {
+            if (NextPtr->RPtr == NULL)
+            {
+                if ((NewPtr = malloc(sizeof(struct tBSTNode))) != 0)
+                {
+                    NewPtr->Key = K;
+                    NewPtr->BSTNodeCont = Content;
+                    NewPtr->LPtr = NULL;
+                    NewPtr->RPtr = NULL;
+                }
+                NextPtr->RPtr = NewPtr; 
+                return;
+            }
+            else 
+                NextPtr = NextPtr->RPtr;
+        }
+    }
+    BSTInsert(&NextPtr, K, Content); 
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 	
 }
 
@@ -119,10 +172,19 @@ void ReplaceByRightmost (tBSTNodePtr PtrReplaced, tBSTNodePtr *RootPtr) {
 ** Tato pomocná funkce bude pou¾ita dále. Ne¾ ji zaènete implementovat,
 ** pøeètìte si komentáø k funkci BSTDelete(). 
 **/
-	
-	
-		
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    if (*RootPtr == NULL)
+        return;
+    if ((*RootPtr)->RPtr == NULL)
+    {
+        PtrReplaced->Key = (*RootPtr)->Key;
+        PtrReplaced->BSTNodeCont = (*RootPtr)->BSTNodeCont;
+        PtrReplaced->LPtr = (*RootPtr)->LPtr;
+        PtrReplaced->RPtr = (*RootPtr)->RPtr;
+        return;
+    }	
+    else
+         ReplaceByRightmost(PtrReplaced, &((*RootPtr)->RPtr));
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 	
 }
 
@@ -138,10 +200,60 @@ void BSTDelete (tBSTNodePtr *RootPtr, char K) 		{
 ** Tuto funkci implementujte rekurzivnì s vyu¾itím døíve deklarované
 ** pomocné funkce ReplaceByRightmost.
 **/
-	
-	
-	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    	
+    tBSTNodePtr NextPtr = *RootPtr, SavedPtr = NULL;
+    if (NextPtr->Key != K && NextPtr->LPtr == NULL && NextPtr->RPtr == NULL)	
+        return;
+    else if (NextPtr->Key < K)
+    {
+        if (NextPtr->LPtr->Key != K)
+            NextPtr = NextPtr->LPtr;
+        else
+        {
+            SavedPtr = NextPtr->LPtr;
+            if (NextPtr->LPtr->LPtr == NULL)
+                NextPtr->LPtr = NextPtr->LPtr->RPtr;
+            else if (NextPtr->LPtr->RPtr == NULL)
+                NextPtr->LPtr = NextPtr->LPtr->LPtr;
+            else
+            {
+                ReplaceByRightmost(NextPtr, &(NextPtr->LPtr));
+                free(SavedPtr);
+                return;
+            }
+        }
+        BSTDelete(&NextPtr, K);
+    }
+    else if (NextPtr->Key > K)
+    {
+        if (NextPtr->RPtr->Key != K)
+            NextPtr = NextPtr->RPtr;
+        else
+        {   
+            SavedPtr = NextPtr->RPtr;
+            if (NextPtr->RPtr->LPtr == NULL)
+                NextPtr->RPtr = NextPtr->RPtr->LPtr;
+            else if (NextPtr->RPtr->RPtr == NULL)
+                NextPtr->RPtr = NextPtr->RPtr->RPtr;
+            else
+            {
+                ReplaceByRightmost(NextPtr, &(NextPtr->LPtr));
+                free(SavedPtr);
+                return;
+            }
+        }
+        BSTDelete(&NextPtr, K);
+    }
+    else
+    {
+        free(NextPtr);
+        return;
+    }
+
+    free(SavedPtr);
+    return;
+    
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 
 } 
 
@@ -154,8 +266,15 @@ void BSTDispose (tBSTNodePtr *RootPtr) {
 ** funkce.
 **/
 	
+    if (*RootPtr == NULL)
+        return;
+    if ((*RootPtr)->LPtr != NULL)
+        BSTDispose(&(*RootPtr)->LPtr);
+    if ((*RootPtr)->RPtr != NULL)
+        BSTDispose(&(*RootPtr)->RPtr);
+    free(RootPtr);
 
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 
 }
 
