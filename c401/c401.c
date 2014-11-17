@@ -132,7 +132,7 @@ void BSTInsert (tBSTNodePtr* RootPtr, char K, int Content)	{
     }
     else
     {
-        if (NextPtr->Key < K)
+        if (NextPtr->Key > K)
         {
             if (NextPtr->LPtr == NULL)
             {
@@ -149,7 +149,7 @@ void BSTInsert (tBSTNodePtr* RootPtr, char K, int Content)	{
             else 
                 NextPtr = NextPtr->LPtr;
         }
-        else if (NextPtr->Key > K)
+        else if (NextPtr->Key < K)
         {
             if (NextPtr->RPtr == NULL)
             {
@@ -184,18 +184,40 @@ void ReplaceByRightmost (tBSTNodePtr PtrReplaced, tBSTNodePtr *RootPtr) {
 ** Tato pomocná funkce bude pou¾ita dále. Ne¾ ji zaènete implementovat,
 ** pøeètìte si komentáø k funkci BSTDelete(). 
 **/
+    tBSTNodePtr SavedPtr;
     if (*RootPtr == NULL)
         return;
+    if (PtrReplaced == NULL)
+    {
+        if ((*RootPtr)->LPtr != NULL)
+            ReplaceByRightmost(NULL, &(*RootPtr)->LPtr);
+    
+    }
     if ((*RootPtr)->RPtr == NULL)
     {
         PtrReplaced->Key = (*RootPtr)->Key;
         PtrReplaced->BSTNodeCont = (*RootPtr)->BSTNodeCont;
-        PtrReplaced->LPtr = (*RootPtr)->LPtr;
-        PtrReplaced->RPtr = (*RootPtr)->RPtr;
-        return;
+        SavedPtr = *RootPtr;
+        if ((*RootPtr)->LPtr != NULL)
+        {
+            if ((*RootPtr) != PtrReplaced->LPtr)
+            {
+                ReplaceByRightmost(NULL,RootPtr);
+                (*RootPtr)->LPtr->LPtr = PtrReplaced->LPtr;
+                PtrReplaced->LPtr = (*RootPtr)->LPtr;
+            }
+            else
+                PtrReplaced->LPtr = (*RootPtr)->LPtr;
+
+        }
+        *RootPtr = NULL;
+        free(SavedPtr);
     }	
     else
+    {
          ReplaceByRightmost(PtrReplaced, &((*RootPtr)->RPtr));
+    }
+
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 	
 }
@@ -219,9 +241,9 @@ void BSTDelete (tBSTNodePtr *RootPtr, char K) 		{
     else
     {
         SavedPtr = NextPtr;
-        if (NextPtr->Key < K)
+        if (NextPtr->Key > K)
             NextPtr = NextPtr->LPtr;
-        else if (NextPtr->Key > K)
+        else if (NextPtr->Key < K)
             NextPtr = NextPtr->RPtr;
         if (NextPtr != NULL)
         {
@@ -230,124 +252,22 @@ void BSTDelete (tBSTNodePtr *RootPtr, char K) 		{
             else
             {
                 if (NextPtr->LPtr == NULL)
-                    (SavedPtr->Key < K ? (SavedPtr->LPtr = NextPtr->RPtr) : (SavedPtr->RPtr = NextPtr->RPtr));
-                else if (NextPtr->RPtr == NULL)
-                    (SavedPtr->Key < K ? (SavedPtr->LPtr = NextPtr->LPtr) : (SavedPtr->RPtr = NextPtr->LPtr));
-                else 
-                    ReplaceByRightmost(SavedPtr, &(NextPtr->LPtr));
+                {
+                    (SavedPtr->Key > K ? (SavedPtr->LPtr = NextPtr->RPtr) : (SavedPtr->RPtr = NextPtr->RPtr));
                 free(NextPtr);
-                return;
-            }
-            return;
-        }
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /* if (NextPtr->Key != K && NextPtr->LPtr == NULL && NextPtr->RPtr == NULL)	
-        return;
-    else if (NextPtr->Key < K)
-    {
-        if (NextPtr->LPtr->Key != K)
-            NextPtr = NextPtr->LPtr;
-        else
-        {
-            SavedPtr = NextPtr->LPtr;
-            if (NextPtr->LPtr->LPtr == NULL)
-                NextPtr->LPtr = NextPtr->LPtr->RPtr;
-            else if (NextPtr->LPtr->RPtr == NULL)
-                NextPtr->LPtr = NextPtr->LPtr->LPtr;
-            else
-            {
-                ReplaceByRightmost(NextPtr, &(NextPtr->LPtr));
-                free(SavedPtr);
-                return;
+                }
+                else if (NextPtr->RPtr == NULL)
+                {
+                    (SavedPtr->Key > K ? (SavedPtr->LPtr = NextPtr->LPtr) : (SavedPtr->RPtr = NextPtr->LPtr));
+                
+                free(NextPtr);
+                }
+                else if (NextPtr->LPtr != NULL && NextPtr->RPtr != NULL)
+                    ReplaceByRightmost(NextPtr, &(NextPtr->LPtr));
             }
         }
-        BSTDelete(&NextPtr, K);
     }
-    else if (NextPtr->Key > K)
-    {
-        if (NextPtr->RPtr->Key != K)
-            NextPtr = NextPtr->RPtr;
-        else
-        {   
-            SavedPtr = NextPtr->RPtr;
-            if (NextPtr->RPtr->LPtr == NULL)
-                NextPtr->RPtr = NextPtr->RPtr->LPtr;
-            else if (NextPtr->RPtr->RPtr == NULL)
-                NextPtr->RPtr = NextPtr->RPtr->RPtr;
-            else
-            {
-                ReplaceByRightmost(NextPtr, &(NextPtr->LPtr));
-                free(SavedPtr);
-                return;
-            }
-        }
-        BSTDelete(&NextPtr, K);
-    }
-    else
-    {
-        free(NextPtr);
-        return;
-    }
-
-    free(SavedPtr);
-    return;
-    */
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
-
 } 
 
 void BSTDispose (tBSTNodePtr *RootPtr) {	
@@ -361,12 +281,24 @@ void BSTDispose (tBSTNodePtr *RootPtr) {
 	
     if (*RootPtr == NULL)
         return;
-    if ((*RootPtr)->LPtr != NULL)
-        BSTDispose(&(*RootPtr)->LPtr);
-    if ((*RootPtr)->RPtr != NULL)
-        BSTDispose(&(*RootPtr)->RPtr);
-    free(RootPtr);
+    else
+    {
 
+        if ((*RootPtr)->LPtr != NULL)
+        {
+            BSTDispose(&(*RootPtr)->LPtr);
+            free((*RootPtr)->LPtr);
+            (*RootPtr)->LPtr = NULL;
+        }
+        if ((*RootPtr)->RPtr != NULL)
+        {
+            BSTDispose(&(*RootPtr)->RPtr);
+            free((*RootPtr)->RPtr);
+            (*RootPtr)->RPtr = NULL;
+        }
+        free((*RootPtr));
+        (*RootPtr)= NULL;
+    }
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 
 }
