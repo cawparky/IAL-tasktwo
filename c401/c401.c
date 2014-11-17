@@ -76,10 +76,13 @@ int BSTSearch (tBSTNodePtr RootPtr, char K, int *Content)	{
 ** pomocnou funkci.
 **/
     tBSTNodePtr NextPtr = RootPtr;
-    if (NextPtr->Key == K)							   
-        return TRUE;
-    else if (NextPtr == NULL)
+    if (NextPtr == NULL)
         return FALSE;
+    else if (NextPtr->Key == K)							   
+    {
+        *Content = NextPtr->BSTNodeCont;
+        return TRUE;
+    }
     else
     {
         if (NextPtr->Key < K)
@@ -112,7 +115,16 @@ void BSTInsert (tBSTNodePtr* RootPtr, char K, int Content)	{
 
     tBSTNodePtr NextPtr = *RootPtr, NewPtr;
 		
-    if (NextPtr->Key == K)							   
+    if ((*RootPtr) == NULL)
+    {
+        (*RootPtr) = malloc(sizeof(struct tBSTNode));
+        (*RootPtr)->Key = K;
+        (*RootPtr)->BSTNodeCont = Content;
+        (*RootPtr)->LPtr = NULL;
+        (*RootPtr)->RPtr = NULL;
+        return;
+    }
+    else if (NextPtr->Key == K)							   
     {
         NextPtr->Key = K;
         NextPtr->BSTNodeCont = Content;
@@ -202,7 +214,88 @@ void BSTDelete (tBSTNodePtr *RootPtr, char K) 		{
 **/
     	
     tBSTNodePtr NextPtr = *RootPtr, SavedPtr = NULL;
-    if (NextPtr->Key != K && NextPtr->LPtr == NULL && NextPtr->RPtr == NULL)	
+    if (NextPtr->Key != K && NextPtr->LPtr == NULL && NextPtr->RPtr == NULL)
+        return;
+    else
+    {
+        SavedPtr = NextPtr;
+        if (NextPtr->Key < K)
+            NextPtr = NextPtr->LPtr;
+        else if (NextPtr->Key > K)
+            NextPtr = NextPtr->RPtr;
+        if (NextPtr != NULL)
+        {
+            if (NextPtr->Key != K) 
+                BSTDelete(&NextPtr, K);
+            else
+            {
+                if (NextPtr->LPtr == NULL)
+                    (SavedPtr->Key < K ? (SavedPtr->LPtr = NextPtr->RPtr) : (SavedPtr->RPtr = NextPtr->RPtr));
+                else if (NextPtr->RPtr == NULL)
+                    (SavedPtr->Key < K ? (SavedPtr->LPtr = NextPtr->LPtr) : (SavedPtr->RPtr = NextPtr->LPtr));
+                else 
+                    ReplaceByRightmost(SavedPtr, &(NextPtr->LPtr));
+                free(NextPtr);
+                return;
+            }
+            return;
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /* if (NextPtr->Key != K && NextPtr->LPtr == NULL && NextPtr->RPtr == NULL)	
         return;
     else if (NextPtr->Key < K)
     {
@@ -252,7 +345,7 @@ void BSTDelete (tBSTNodePtr *RootPtr, char K) 		{
 
     free(SavedPtr);
     return;
-    
+    */
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 
 } 
