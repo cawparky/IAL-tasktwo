@@ -180,8 +180,8 @@ void BTInit (tBTNodePtr *RootPtr)	{
 ** proto je tøeba pøi práci s RootPtr pou¾ít dereferenèní operátor *.
 **/
 	
-	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    *RootPtr = NULL;	
+	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 void BTInsert (tBTNodePtr *RootPtr, int Content) {
@@ -194,10 +194,38 @@ void BTInsert (tBTNodePtr *RootPtr, int Content) {
 ** se ve stromu mù¾e vyskytnout nejvý¹e jednou). Pokud se vytváøí nový uzel,
 ** vzniká v¾dy jako list stromu. Funkci implementujte nerekurzivnì.
 **/
-	
-	
-		
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    tBTNodePtr NewPtr = NULL, NextPtr = *RootPtr;
+    if (*RootPtr == NULL) 
+  {
+    (*RootPtr) = malloc(sizeof(struct tBTNode));
+    (*RootPtr)->Cont = Content;
+    (*RootPtr)->LPtr = NULL;
+    (*RootPtr)->RPtr = NULL;
+  }
+    else
+    {
+        while (NewPtr == NULL)
+        {
+            if (Content < NextPtr->Cont && NextPtr->LPtr != NULL)
+                NextPtr = NextPtr->LPtr;
+            else if (Content > NextPtr->Cont && NextPtr->RPtr != NULL)
+                NextPtr = NextPtr->RPtr;
+            else if (Content == NextPtr->Cont)
+                NewPtr = *RootPtr;
+            else 
+            {
+                NewPtr = malloc(sizeof(struct tBTNode));
+                NewPtr->Cont = Content;
+                NewPtr->LPtr = NULL;
+                NewPtr->RPtr = NULL;
+                if (Content < NextPtr->Cont)
+                    NextPtr->LPtr = NewPtr;
+                else if (Content > NextPtr->Cont)
+                    NextPtr->RPtr = NewPtr;
+            }
+        }
+    }
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 /*                                  PREORDER                                  */
@@ -209,10 +237,13 @@ void Leftmost_Preorder (tBTNodePtr ptr, tStackP *Stack)	{
 ** Pøi prùchodu Preorder nav¹tívené uzly zpracujeme voláním funkce BTWorkOut()
 ** a ukazatele na nì is ulo¾íme do zásobníku.
 **/
-
-	
-	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    while (ptr != NULL)
+    {
+        BTWorkOut(ptr);	
+        SPushP(Stack,ptr);
+        ptr = ptr->LPtr;
+    }
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 void BTPreorder (tBTNodePtr RootPtr)	{
@@ -221,10 +252,18 @@ void BTPreorder (tBTNodePtr RootPtr)	{
 ** Leftmost_Preorder a zásobníku ukazatelù. Zpracování jednoho uzlu stromu
 ** realizujte jako volání funkce BTWorkOut(). 
 **/
+    tStackP Stack;
+    tBTNodePtr UpperNode;
+    SInitP (&Stack);
+    Leftmost_Preorder(RootPtr, &Stack);
+    while (!SEmptyP(&Stack))
+    {
+        UpperNode = STopPopP(&Stack);
+        if (UpperNode->RPtr != NULL)
+            Leftmost_Preorder(UpperNode->RPtr, &Stack);
+    }
 
-	
-	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 
@@ -237,11 +276,13 @@ void Leftmost_Inorder(tBTNodePtr ptr, tStackP *Stack)		{
 ** Pøi prùchodu Inorder ukládáme ukazatele na v¹echny nav¹tívené uzly do
 ** zásobníku. 
 **/
-	
-	
-	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
-	
+    while (ptr != NULL)
+    {
+        SPushP(Stack,ptr);
+        ptr = ptr->LPtr;
+    }
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+
 }
 
 void BTInorder (tBTNodePtr RootPtr)	{
@@ -250,10 +291,20 @@ void BTInorder (tBTNodePtr RootPtr)	{
 ** Leftmost_Inorder a zásobníku ukazatelù. Zpracování jednoho uzlu stromu
 ** realizujte jako volání funkce BTWorkOut(). 
 **/
-
+    tStackP Stack;
+    tBTNodePtr UpperNode;
+    SInitP (&Stack);
+    Leftmost_Inorder(RootPtr, &Stack);
+    while (!SEmptyP(&Stack))
+    {
+        UpperNode = STopPopP(&Stack);
+        BTWorkOut(UpperNode);
+        if (UpperNode->RPtr != NULL)
+            Leftmost_Inorder(UpperNode->RPtr, &Stack);
+    } 
 	
 	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 /*                                 POSTORDER                                  */ 
@@ -266,10 +317,17 @@ void Leftmost_Postorder (tBTNodePtr ptr, tStackP *StackP, tStackB *StackB) {
 ** a souèasnì do zásobníku bool hodnot ukládáme informaci, zda byl uzel
 ** nav¹tíven poprvé a ¾e se tedy je¹tì nemá zpracovávat. 
 **/
+    while (ptr != NULL)
+    {
+        SPushP(StackP,ptr);
+        SPushB(StackB,FALSE);
+        ptr = ptr->LPtr;
+    }
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 
 	
 	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 void BTPostorder (tBTNodePtr RootPtr)	{
@@ -279,9 +337,31 @@ void BTPostorder (tBTNodePtr RootPtr)	{
 ** Zpracování jednoho uzlu stromu realizujte jako volání funkce BTWorkOut(). 
 **/
 
+    tStackP StackP;
+    tStackB StackB;
+    tBTNodePtr UpperNode;
+    bool Visited;
+    SInitP (&StackP);
+    SInitB (&StackB);
+    Leftmost_Postorder(RootPtr, &StackP, &StackB);
+    while (!SEmptyP(&StackP))
+    {
+        UpperNode = STopPopP(&StackP);
+        Visited = STopPopB(&StackB);
+        if (Visited)
+            BTWorkOut(UpperNode);
+        else
+        {
+            SPushP(&StackP,UpperNode);
+            SPushB(&StackB,TRUE);
+            if (UpperNode->RPtr != NULL)
+                Leftmost_Postorder(UpperNode->RPtr, &StackP, &StackB);
+        }
+    } 
+	
 	
 		
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 
@@ -291,10 +371,26 @@ void BTDisposeTree (tBTNodePtr *RootPtr)	{
 **
 ** Funkci implementujte nerekurzivnì s vyu¾itím zásobníku ukazatelù.
 **/
+    if (*RootPtr != NULL)
+    {
+        tStackP Stack;
+        SInitP (&Stack);
+        tBTNodePtr PtrCache = *RootPtr;
+        SPushP(&Stack, PtrCache);
+        while (!SEmptyP(&Stack))
+        {
+            if (PtrCache->LPtr != NULL)
+                SPushP(&Stack, PtrCache->LPtr);
+            if (PtrCache->RPtr != NULL)
+                SPushP(&Stack, PtrCache->RPtr);
 
+            free(PtrCache);
+            PtrCache = STopPopP(&Stack);
+        }
+        *RootPtr = NULL;
 	
-	
-	 solved = FALSE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    }	
+	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 /* konec c402.c */
