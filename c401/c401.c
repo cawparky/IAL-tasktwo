@@ -85,9 +85,9 @@ int BSTSearch (tBSTNodePtr RootPtr, char K, int *Content)	{
     }
     else
     {
-        if (NextPtr->Key < K)
+        if (NextPtr->Key > K)
             NextPtr = NextPtr->LPtr;
-        else if (NextPtr->Key > K)
+        else if (NextPtr->Key < K)
             NextPtr = NextPtr->RPtr;
         return BSTSearch(NextPtr, K, Content);
     }
