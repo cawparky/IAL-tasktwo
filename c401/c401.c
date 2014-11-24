@@ -198,19 +198,7 @@ void ReplaceByRightmost (tBSTNodePtr PtrReplaced, tBSTNodePtr *RootPtr) {
         PtrReplaced->Key = (*RootPtr)->Key;
         PtrReplaced->BSTNodeCont = (*RootPtr)->BSTNodeCont;
         SavedPtr = *RootPtr;
-        if ((*RootPtr)->LPtr != NULL)
-        {
-            if ((*RootPtr) != PtrReplaced->LPtr)
-            {
-                ReplaceByRightmost(NULL,RootPtr);
-                (*RootPtr)->LPtr->LPtr = PtrReplaced->LPtr;
-                PtrReplaced->LPtr = (*RootPtr)->LPtr;
-            }
-            else
-                PtrReplaced->LPtr = (*RootPtr)->LPtr;
-
-        }
-        *RootPtr = NULL;
+        *RootPtr = (*RootPtr)->LPtr;
         free(SavedPtr);
     }	
     else
