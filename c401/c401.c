@@ -56,7 +56,7 @@ void BSTInit (tBSTNodePtr *RootPtr) {
 ** Ten bude pou¾it i ve funkcích BSTDelete, BSTInsert a BSTDispose.
 **/
 	
-    *RootPtr = NULL;	
+    *RootPtr = NULL;        // inicializace prazdneho stromu	
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 	
 }	
@@ -76,20 +76,20 @@ int BSTSearch (tBSTNodePtr RootPtr, char K, int *Content)	{
 ** pomocnou funkci.
 **/
     tBSTNodePtr NextPtr = RootPtr;
-    if (NextPtr == NULL)
+    if (NextPtr == NULL) // pokud neexistuje nasledovnik nenasli jsme
         return FALSE;
-    else if (NextPtr->Key == K)							   
+    else if (NextPtr->Key == K)	// pokud nasli jsme hledany prvek		   
     {
         *Content = NextPtr->BSTNodeCont;
         return TRUE;
     }
-    else
+    else                    // prejdi na dalsi prvek
     {
-        if (NextPtr->Key > K)
+        if (NextPtr->Key > K) // je mensi? jdi vlevo
             NextPtr = NextPtr->LPtr;
-        else if (NextPtr->Key < K)
+        else if (NextPtr->Key < K)  // je vetsi? jdi vpravo
             NextPtr = NextPtr->RPtr;
-        return BSTSearch(NextPtr, K, Content);
+        return BSTSearch(NextPtr, K, Content); // proved se s dalsim a vrat zda jsi nasel
     }
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 	
@@ -115,7 +115,7 @@ void BSTInsert (tBSTNodePtr* RootPtr, char K, int Content)	{
 
     tBSTNodePtr NextPtr = *RootPtr, NewPtr;
 		
-    if ((*RootPtr) == NULL)
+    if ((*RootPtr) == NULL) // prazdny strom? vloz tam koren a zkonci
     {
         (*RootPtr) = malloc(sizeof(struct tBSTNode));
         (*RootPtr)->Key = K;
@@ -124,7 +124,7 @@ void BSTInsert (tBSTNodePtr* RootPtr, char K, int Content)	{
         (*RootPtr)->RPtr = NULL;
         return;
     }
-    else if (NextPtr->Key == K)							   
+    else if (NextPtr->Key == K)	// aktualizij hodnoty pokud prvek jiz existuje
     {
         NextPtr->Key = K;
         NextPtr->BSTNodeCont = Content;
@@ -132,42 +132,43 @@ void BSTInsert (tBSTNodePtr* RootPtr, char K, int Content)	{
     }
     else
     {
-        if (NextPtr->Key > K)
+        if (NextPtr->Key > K) // pracuj s levou stranou 
         {
-            if (NextPtr->LPtr == NULL)
+            if (NextPtr->LPtr == NULL) // neexistuje levy, vytvor novy s danou hodnotou
             {
-                if ((NewPtr = malloc(sizeof(struct tBSTNode))) != 0)
+                if ((NewPtr = malloc(sizeof(struct tBSTNode))) != 0) // pokud se povedlo
                 {
                     NewPtr->Key = K;
                     NewPtr->BSTNodeCont = Content;
                     NewPtr->LPtr = NULL;
                     NewPtr->RPtr = NULL;
                 }
-                NextPtr->LPtr = NewPtr;
+                NextPtr->LPtr = NewPtr; // pripoj novy list
                 return;
             }
             else 
-                NextPtr = NextPtr->LPtr;
+                NextPtr = NextPtr->LPtr; // jdi vpravo
         }
-        else if (NextPtr->Key < K)
+        else if (NextPtr->Key < K) // pracuj s pravou stanou
         {
-            if (NextPtr->RPtr == NULL)
+            if (NextPtr->RPtr == NULL) // neexistuje pravy, vytvor novy s danou hodnotou
+
             {
-                if ((NewPtr = malloc(sizeof(struct tBSTNode))) != 0)
+                if ((NewPtr = malloc(sizeof(struct tBSTNode))) != 0) // pokud se povedlo
                 {
                     NewPtr->Key = K;
                     NewPtr->BSTNodeCont = Content;
                     NewPtr->LPtr = NULL;
                     NewPtr->RPtr = NULL;
                 }
-                NextPtr->RPtr = NewPtr; 
+                NextPtr->RPtr = NewPtr; // pripoj novy list
                 return;
             }
             else 
-                NextPtr = NextPtr->RPtr;
+                NextPtr = NextPtr->RPtr; // jdi vpravo
         }
     }
-    BSTInsert(&NextPtr, K, Content); 
+    BSTInsert(&NextPtr, K, Content); // proved se pro dalsi prvek
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 	
 }
@@ -185,26 +186,22 @@ void ReplaceByRightmost (tBSTNodePtr PtrReplaced, tBSTNodePtr *RootPtr) {
 ** pøeètìte si komentáø k funkci BSTDelete(). 
 **/
     tBSTNodePtr SavedPtr = NULL;
-    if (*RootPtr == NULL)
+    if (*RootPtr == NULL) // je strom prazdny? pak nedelej
         return;
-    if (PtrReplaced == NULL)
+
+    if ((*RootPtr)->RPtr == NULL) // jsem nejvetsi prvek podstromu
     {
-        if ((*RootPtr)->LPtr != NULL)
-            ReplaceByRightmost(NULL, &(*RootPtr)->LPtr);
-        return;
-    }
-    if ((*RootPtr)->RPtr == NULL)
-    {
+        // presun hodnoty z nejpravejsiho do prepisovaneho
         PtrReplaced->Key = (*RootPtr)->Key;
         PtrReplaced->BSTNodeCont = (*RootPtr)->BSTNodeCont;
         SavedPtr = *RootPtr;
-        *RootPtr = (*RootPtr)->LPtr;
+        *RootPtr = (*RootPtr)->LPtr; // zachovej levej podstrom nejpravejsiho   
         free(SavedPtr);
         return;
     }	
     else
     {
-         ReplaceByRightmost(PtrReplaced, &((*RootPtr)->RPtr));
+         ReplaceByRightmost(PtrReplaced, &((*RootPtr)->RPtr)); // proved se znova na pravem prvku
          return;
     }
 
@@ -226,22 +223,22 @@ void BSTDelete (tBSTNodePtr *RootPtr, char K) 		{
 **/
     	
     tBSTNodePtr NextPtr = *RootPtr, SavedPtr = NULL;
-    if (NextPtr->Key != K && NextPtr->LPtr == NULL && NextPtr->RPtr == NULL)
+    if (NextPtr->Key != K && NextPtr->LPtr == NULL && NextPtr->RPtr == NULL) // konec stromu, prvek neni prvek k smazani
         return;
     else
     {
         SavedPtr = NextPtr;
-        if (NextPtr->Key > K)
+        if (NextPtr->Key > K) // jdi vlevo
             NextPtr = NextPtr->LPtr;
-        else if (NextPtr->Key < K)
+        else if (NextPtr->Key < K) // jdi vpravo
             NextPtr = NextPtr->RPtr;
-        if (NextPtr != NULL)
+        if (NextPtr != NULL) // dalsi prvek existuje
         {
-            if (NextPtr->Key != K) 
+            if (NextPtr->Key != K) // kdyz dalsi neni hledany prvek proved se znovu
                 BSTDelete(&NextPtr, K);
             else
-            {
-                if (NextPtr->LPtr == NULL)
+            {   // pokud existuje jenom jeden podstrom
+                if (NextPtr->LPtr == NULL) 
                 {
                     (SavedPtr->Key > K ? (SavedPtr->LPtr = NextPtr->RPtr) : (SavedPtr->RPtr = NextPtr->RPtr));
                 free(NextPtr);
@@ -252,6 +249,8 @@ void BSTDelete (tBSTNodePtr *RootPtr, char K) 		{
                 
                 free(NextPtr);
                 }
+                
+                // pokud existuji oba podstromy
                 else if (NextPtr->LPtr != NULL && NextPtr->RPtr != NULL)
                     ReplaceByRightmost(NextPtr, &(NextPtr->LPtr));
             }
@@ -269,25 +268,24 @@ void BSTDispose (tBSTNodePtr *RootPtr) {
 ** funkce.
 **/
 	
-    if (*RootPtr == NULL)
+    if (*RootPtr == NULL) // prazdny strom? nedelej nic
         return;
     else
     {
-
-        if ((*RootPtr)->LPtr != NULL)
+        if ((*RootPtr)->LPtr != NULL)       // pokud exituje levy podstrom
         {
-            BSTDispose(&(*RootPtr)->LPtr);
-            free((*RootPtr)->LPtr);
-            (*RootPtr)->LPtr = NULL;
+            BSTDispose(&(*RootPtr)->LPtr);  // zavolej se a jdi doleva
+            free((*RootPtr)->LPtr);         // uvolni levy
+            (*RootPtr)->LPtr = NULL;        // smaz ukazatel na uvolneny
         }
-        if ((*RootPtr)->RPtr != NULL)
+        if ((*RootPtr)->RPtr != NULL)       // pokud existuje pravy podstrom
         {
-            BSTDispose(&(*RootPtr)->RPtr);
-            free((*RootPtr)->RPtr);
-            (*RootPtr)->RPtr = NULL;
+            BSTDispose(&(*RootPtr)->RPtr);  // zavolej se a jdi doprava
+            free((*RootPtr)->RPtr);         // uvolni pravy
+            (*RootPtr)->RPtr = NULL;        // smaz ukazatel na uvoleny
         }
-        free((*RootPtr));
-        (*RootPtr)= NULL;
+        free((*RootPtr));                   // uvolni koren
+        (*RootPtr)= NULL;                   // uved do stavu po inicializaci
     }
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 

@@ -66,7 +66,7 @@ int hashCode ( tKey key ) {
 */
 
 void htInit ( tHTable* ptrht ) {
-    for (int i = 0; i < HTSIZE; i++)
+    for (int i = 0; i < HTSIZE; i++) // priradime vsem polozkam pole NULL
         (*ptrht)[i] = NULL;
 
  solved = 1; /*v pripade reseni, smazte tento radek!*/
@@ -81,7 +81,7 @@ void htInit ( tHTable* ptrht ) {
 
 tHTItem* htSearch ( tHTable* ptrht, tKey key ) {
     tHTItem* iptr = (*ptrht)[hashCode(key)];
-    while (iptr != NULL && iptr->key != key)
+    while (iptr != NULL && iptr->key != key) // dokud existuje polozka a nenasli jsme shodu
         iptr = iptr->ptrnext;
 
     return iptr;
@@ -105,15 +105,15 @@ void htInsert ( tHTable* ptrht, tKey key, tData data ) {
     int hash = hashCode(key);
     tHTItem* iptr;
     
-    if ((iptr = htSearch(ptrht, key)) != NULL)
+    if ((iptr = htSearch(ptrht, key)) != NULL) // pokud jsme nasli prepis hodnotu
         iptr->data = data;
-    else
-        if ((iptr = malloc(sizeof(struct tHTItem))) != 0)
+    else                                        // jinak vytvor novou polozku
+        if ((iptr = malloc(sizeof(struct tHTItem))) != 0) 
         {
             iptr->key = key;
             iptr->data = data;
-            iptr->ptrnext = (*ptrht)[hash];
-            (*ptrht)[hash] = iptr;
+            iptr->ptrnext = (*ptrht)[hash]; // urceni naslednika
+            (*ptrht)[hash] = iptr;          // zarazeni na zacatek
         }
 
  solved = 1; /*v pripade reseni, smazte tento radek!*/
@@ -130,11 +130,11 @@ void htInsert ( tHTable* ptrht, tKey key, tData data ) {
 
 tData* htRead ( tHTable* ptrht, tKey key ) {
     tHTItem* iptr = htSearch(ptrht, key);
-    if (iptr != NULL)
+    if (iptr != NULL)   // nasel jsi? vrat mi ukazatel na polozku
         return &iptr->data;
-    return NULL;
+    return NULL;        // jinak vrat NULL
 
- solved = 0; /*v pripade reseni, smazte tento radek!*/
+ solved = 1; /*v pripade reseni, smazte tento radek!*/
 }
 
 /*
@@ -148,11 +148,11 @@ tData* htRead ( tHTable* ptrht, tKey key ) {
 */
 
 void htDelete ( tHTable* ptrht, tKey key ) {
-    int isFreed = 0, hash = hashCode(key);
+    int isfreed = 0, hash = hashCode(key);
     tHTItem* preptr;
     tHTItem* iptr = (*ptrht)[hash];
     preptr = iptr;
-    while (iptr != NULL && !isFreed)
+    while (iptr != NULL && !isfreed) // dokud existuji prvky k projiti a nebyl jeste zadny uvolnen 
     {
         if (iptr->key == key)
         {
@@ -161,7 +161,7 @@ void htDelete ( tHTable* ptrht, tKey key ) {
             else
                 preptr->ptrnext = iptr->ptrnext;
             free(iptr);
-            isFreed = 1;
+            isfreed = 1; // uvolnili jsme
         }
         else 
         {
@@ -169,7 +169,6 @@ void htDelete ( tHTable* ptrht, tKey key ) {
             iptr = iptr->ptrnext;
         }
     }
-    preptr = NULL;
  solved = 1; /*v pripade reseni, smazte tento radek!*/
 }
 
@@ -180,10 +179,10 @@ void htDelete ( tHTable* ptrht, tKey key ) {
 
 void htClearAll ( tHTable* ptrht ) {
     tHTItem *iptr,*niptr;
-    for (int i = 0; i<HTSIZE; i++)
+    for (int i = 0; i<HTSIZE; i++) // pro kazdy prvek pole
     {
         iptr = (*ptrht)[i];
-        while (iptr!= NULL)
+        while (iptr != NULL)       // dokud existuji polozky pro dany hash
         {
             niptr = iptr->ptrnext;
             free(iptr);

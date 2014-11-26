@@ -180,8 +180,9 @@ void BTInit (tBTNodePtr *RootPtr)	{
 ** proto je tøeba pøi práci s RootPtr pou¾ít dereferenèní operátor *.
 **/
 	
-    *RootPtr = NULL;	
-	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    *RootPtr = NULL;        // inicializace prazdneho stromu	
+    
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 void BTInsert (tBTNodePtr *RootPtr, int Content) {
@@ -195,29 +196,31 @@ void BTInsert (tBTNodePtr *RootPtr, int Content) {
 ** vzniká v¾dy jako list stromu. Funkci implementujte nerekurzivnì.
 **/
     tBTNodePtr NewPtr = NULL, NextPtr = *RootPtr;
-    if (*RootPtr == NULL) 
-  {
-    (*RootPtr) = malloc(sizeof(struct tBTNode));
-    (*RootPtr)->Cont = Content;
-    (*RootPtr)->LPtr = NULL;
-    (*RootPtr)->RPtr = NULL;
-  }
+    if (*RootPtr == NULL) // prazdny strom? vloz koren
+    {
+        (*RootPtr) = malloc(sizeof(struct tBTNode));
+        (*RootPtr)->Cont = Content;
+        (*RootPtr)->LPtr = NULL;
+        (*RootPtr)->RPtr = NULL;
+    }
     else
     {
-        while (NewPtr == NULL)
+        while (NewPtr == NULL) // dokud jsem nevytvoril novy
         {
-            if (Content < NextPtr->Cont && NextPtr->LPtr != NULL)
-                NextPtr = NextPtr->LPtr;
-            else if (Content > NextPtr->Cont && NextPtr->RPtr != NULL)
-                NextPtr = NextPtr->RPtr;
-            else if (Content == NextPtr->Cont)
+            if (Content < NextPtr->Cont && NextPtr->LPtr != NULL) // mensi a muzu jit doleva
+                NextPtr = NextPtr->LPtr;    
+            else if (Content > NextPtr->Cont && NextPtr->RPtr != NULL) // vetsi a muzu jit doprava
+                NextPtr = NextPtr->RPtr;    
+            else if (Content == NextPtr->Cont) // pokud se rovnaji (unik ze cyklu)
                 NewPtr = *RootPtr;
-            else 
+            else                                // jinak vytvor novy prvek
             {
                 NewPtr = malloc(sizeof(struct tBTNode));
                 NewPtr->Cont = Content;
                 NewPtr->LPtr = NULL;
                 NewPtr->RPtr = NULL;
+                
+                // pripoj ho kam patri
                 if (Content < NextPtr->Cont)
                     NextPtr->LPtr = NewPtr;
                 else if (Content > NextPtr->Cont)
@@ -225,6 +228,7 @@ void BTInsert (tBTNodePtr *RootPtr, int Content) {
             }
         }
     }
+   
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
@@ -237,12 +241,13 @@ void Leftmost_Preorder (tBTNodePtr ptr, tStackP *Stack)	{
 ** Pøi prùchodu Preorder nav¹tívené uzly zpracujeme voláním funkce BTWorkOut()
 ** a ukazatele na nì is ulo¾íme do zásobníku.
 **/
-    while (ptr != NULL)
+    while (ptr != NULL) // dokud muzu jit doleva
     {
         BTWorkOut(ptr);	
         SPushP(Stack,ptr);
         ptr = ptr->LPtr;
     }
+
     solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
@@ -255,15 +260,15 @@ void BTPreorder (tBTNodePtr RootPtr)	{
     tStackP Stack;
     tBTNodePtr UpperNode;
     SInitP (&Stack);
-    Leftmost_Preorder(RootPtr, &Stack);
-    while (!SEmptyP(&Stack))
+    Leftmost_Preorder(RootPtr, &Stack); // najdi nejlevejsi prvek stromu a napln zasobnik
+    while (!SEmptyP(&Stack)) // je zasobnik prazdny?
     {
         UpperNode = STopPopP(&Stack);
-        if (UpperNode->RPtr != NULL)
-            Leftmost_Preorder(UpperNode->RPtr, &Stack);
+        if (UpperNode->RPtr != NULL) // pokud muzu jit doprava
+            Leftmost_Preorder(UpperNode->RPtr, &Stack); // najdi nejlevejsi prvek praveho podstromu
     }
 
-	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 
@@ -276,13 +281,13 @@ void Leftmost_Inorder(tBTNodePtr ptr, tStackP *Stack)		{
 ** Pøi prùchodu Inorder ukládáme ukazatele na v¹echny nav¹tívené uzly do
 ** zásobníku. 
 **/
-    while (ptr != NULL)
+    while (ptr != NULL) // dokud muzu jit doleva
     {
         SPushP(Stack,ptr);
         ptr = ptr->LPtr;
     }
-    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 void BTInorder (tBTNodePtr RootPtr)	{
@@ -294,17 +299,16 @@ void BTInorder (tBTNodePtr RootPtr)	{
     tStackP Stack;
     tBTNodePtr UpperNode;
     SInitP (&Stack);
-    Leftmost_Inorder(RootPtr, &Stack);
-    while (!SEmptyP(&Stack))
+    Leftmost_Inorder(RootPtr, &Stack); // najdi nejlevejsi a napln zasobnik
+    while (!SEmptyP(&Stack)) // je zasobnik prazdny?
     {
         UpperNode = STopPopP(&Stack);
         BTWorkOut(UpperNode);
-        if (UpperNode->RPtr != NULL)
-            Leftmost_Inorder(UpperNode->RPtr, &Stack);
+        if (UpperNode->RPtr != NULL) // pokud muzu jit doprava
+            Leftmost_Inorder(UpperNode->RPtr, &Stack); // najdi nelevejsi prvek praveho podstromu
     } 
-	
-	
-	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 /*                                 POSTORDER                                  */ 
@@ -317,17 +321,14 @@ void Leftmost_Postorder (tBTNodePtr ptr, tStackP *StackP, tStackB *StackB) {
 ** a souèasnì do zásobníku bool hodnot ukládáme informaci, zda byl uzel
 ** nav¹tíven poprvé a ¾e se tedy je¹tì nemá zpracovávat. 
 **/
-    while (ptr != NULL)
+    while (ptr != NULL) // dokud muzu jit doleva
     {
         SPushP(StackP,ptr);
         SPushB(StackB,FALSE);
         ptr = ptr->LPtr;
     }
-    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 
-	
-	
-	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 void BTPostorder (tBTNodePtr RootPtr)	{
@@ -336,32 +337,29 @@ void BTPostorder (tBTNodePtr RootPtr)	{
 ** Leftmost_Postorder, zásobníku ukazatelù a zásobníku hotdnot typu bool.
 ** Zpracování jednoho uzlu stromu realizujte jako volání funkce BTWorkOut(). 
 **/
-
     tStackP StackP;
     tStackB StackB;
     tBTNodePtr UpperNode;
     bool Visited;
     SInitP (&StackP);
     SInitB (&StackB);
-    Leftmost_Postorder(RootPtr, &StackP, &StackB);
-    while (!SEmptyP(&StackP))
+    Leftmost_Postorder(RootPtr, &StackP, &StackB); // najdi nejlevejsi a napln zasobniky
+    while (!SEmptyP(&StackP)) // je zasobnik prazdny?
     {
         UpperNode = STopPopP(&StackP);
-        Visited = STopPopB(&StackB);
-        if (Visited)
+        Visited = STopPopB(&StackB); // prosel jsem uz jim?
+        if (Visited) // nenavstivil jsem ho?
             BTWorkOut(UpperNode);
-        else
+        else 
         {
             SPushP(&StackP,UpperNode);
             SPushB(&StackB,TRUE);
-            if (UpperNode->RPtr != NULL)
-                Leftmost_Postorder(UpperNode->RPtr, &StackP, &StackB);
+            if (UpperNode->RPtr != NULL) // pokud muzu jit doprava
+                Leftmost_Postorder(UpperNode->RPtr, &StackP, &StackB); // najdi nejlevejsi praveho podstromu a napln zasobniky
         }
     } 
-	
-	
-		
-	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 
@@ -376,21 +374,21 @@ void BTDisposeTree (tBTNodePtr *RootPtr)	{
         tStackP Stack;
         SInitP (&Stack);
         tBTNodePtr PtrCache = *RootPtr;
-        SPushP(&Stack, PtrCache);
-        while (!SEmptyP(&Stack))
+        SPushP(&Stack, PtrCache);   // vloz koren na zasobnik
+        while (!SEmptyP(&Stack))    // je zasobnik prazdny?
         {
-            if (PtrCache->LPtr != NULL)
+            if (PtrCache->LPtr != NULL)     // kdyz existuje levy
                 SPushP(&Stack, PtrCache->LPtr);
-            if (PtrCache->RPtr != NULL)
+            if (PtrCache->RPtr != NULL)     // kdyz existuje pravy
                 SPushP(&Stack, PtrCache->RPtr);
 
             free(PtrCache);
             PtrCache = STopPopP(&Stack);
         }
-        *RootPtr = NULL;
-	
+        *RootPtr = NULL;        // vrat koren do puvodniho stavu
+
     }	
-	 solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
+    solved = TRUE;		  /* V pøípadì øe¹ení sma¾te tento øádek! */	
 }
 
 /* konec c402.c */
